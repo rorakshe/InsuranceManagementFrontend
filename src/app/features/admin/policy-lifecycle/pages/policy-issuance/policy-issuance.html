@@ -1,0 +1,217 @@
+
+<div class="issuance-page">
+
+  <div class="page-heading">
+    <a routerLink="/admin/policy-lifecycle" class="back-link">
+      ← Back to Policy Lifecycle
+    </a>
+
+    <h2>Policy Issuance</h2>
+    <p>View and manage policies from the backend.</p>
+  </div>
+
+  <section class="summary-grid">
+    <article class="summary-card">
+      <span>Total Policies</span>
+      <strong>{{ policies.length }}</strong>
+    </article>
+
+    <article class="summary-card">
+      <span>Active Policies</span>
+      <strong>{{ activeCount }}</strong>
+    </article>
+
+    <article class="summary-card">
+      <span>Expired Policies</span>
+      <strong>{{ expiredCount }}</strong>
+    </article>
+
+    <article class="summary-card">
+      <span>Cancelled Policies</span>
+      <strong>{{ cancelledCount }}</strong>
+    </article>
+  </section>
+
+  <section class="applications-panel">
+    <div class="panel-heading">
+      <div>
+        <h3>Policy Records</h3>
+        <p>Policies retrieved from the insurance backend.</p>
+      </div>
+
+      <button
+        type="button"
+        class="secondary-button"
+        (click)="loadPolicies()"
+        [disabled]="loading">
+        {{ loading ? 'Loading...' : 'Refresh Policies' }}
+      </button>
+    </div>
+
+    <div class="filters">
+      <input
+        type="text"
+        [(ngModel)]="searchText"
+        placeholder="Search policy number, customer ID or status..."
+        aria-label="Search policies" />
+
+      <select
+        [(ngModel)]="selectedStatus"
+        aria-label="Filter policies by status">
+
+        <option value="All">All statuses</option>
+        <option value="ACTIVE">Active</option>
+        <option value="EXPIRED">Expired</option>
+        <option value="CANCELLED">Cancelled</option>
+        <option value="SUSPENDED">Suspended</option>
+      </select>
+    </div>
+
+    @if (loading) {
+      <div class="empty-state">Loading policies from the backend...</div>
+    } @else if (errorMessage) {
+      <div class="empty-state">
+        <p>{{ errorMessage }}</p>
+        <button
+          type="button"
+          class="secondary-button"
+          (click)="loadPolicies()">
+          Retry
+        </button>
+      </div>
+    } @else {
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Policy Number</th>
+              <th>Customer ID</th>
+              <th>Issue Date</th>
+              <th>Effective Date</th>
+              <th>Expiry Date</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            @for (policy of filteredPolicies; track policy.policyId) {
+              <tr>
+                <td class="application-id">{{ policy.policyNumber }}</td>
+                <td>{{ policy.customerId }}</td>
+                <td>{{ policy.issueDate | date:'dd MMM yyyy' }}</td>
+                <td>{{ policy.effectiveDate | date:'dd MMM yyyy' }}</td>
+                <td>{{ policy.expiryDate | date:'dd MMM yyyy' }}</td>
+                <td>
+                  <span
+                    class="status-badge"
+                    [class.pending]="policy.policyStatus === 'PENDING'"
+                    [class.approved]="policy.policyStatus === 'APPROVED'"
+                    [class.issued]="policy.policyStatus === 'ACTIVE'"
+                    [class.rejected]="policy.policyStatus === 'CANCELLED' || policy.policyStatus === 'EXPIRED'">
+                    {{ policy.policyStatus }}
+                  </span>
+                </td>
+                <td>
+                  <button
+                    type="button"
+                    class="view-button"
+                    (click)="viewPolicy(policy)">
+                    View
+                  </button>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="7" class="empty-state">
+                  No policies match your search or selected status.
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+
+    <p class="demo-note">
+      Policy information is loaded from the backend. Status changes are not
+      performed on this page.
+    </p>
+  </section>
+
+  @if (selectedPolicy; as policy) {
+    <div class="modal-backdrop" (click)="closeDetails()">
+      <section
+        class="details-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="policy-details-title"
+        (click)="$event.stopPropagation()">
+
+        <div class="modal-heading">
+          <div>
+            <h3 id="policy-details-title">Policy Details</h3>
+            <p>{{ policy.policyNumber }}</p>
+          </div>
+
+          <button
+            type="button"
+            class="close-button"
+            aria-label="Close policy details"
+            (click)="closeDetails()">
+            ×
+          </button>
+        </div>
+
+        <div class="details-grid">
+          <div>
+            <span>Policy ID</span>
+            <strong>{{ policy.policyId }}</strong>
+          </div>
+          <div>
+            <span>Policy Number</span>
+            <strong>{{ policy.policyNumber }}</strong>
+          </div>
+          <div>
+            <span>Quote ID</span>
+            <strong>{{ policy.quoteId }}</strong>
+          </div>
+          <div>
+            <span>Customer ID</span>
+            <strong>{{ policy.customerId }}</strong>
+          </div>
+          <div>
+            <span>Product ID</span>
+            <strong>{{ policy.productId }}</strong>
+          </div>
+          <div>
+            <span>Issue Date</span>
+            <strong>{{ policy.issueDate | date:'dd MMM yyyy' }}</strong>
+          </div>
+          <div>
+            <span>Effective Date</span>
+            <strong>{{ policy.effectiveDate | date:'dd MMM yyyy' }}</strong>
+          </div>
+          <div>
+            <span>Expiry Date</span>
+            <strong>{{ policy.expiryDate | date:'dd MMM yyyy' }}</strong>
+          </div>
+          <div>
+            <span>Status</span>
+            <strong>{{ policy.policyStatus }}</strong>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button
+            type="button"
+            class="secondary-button"
+            (click)="closeDetails()">
+            Close
+          </button>
+        </div>
+      </section>
+    </div>
+  }
+
+</div>

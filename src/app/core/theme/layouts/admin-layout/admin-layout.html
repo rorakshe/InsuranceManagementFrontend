@@ -1,0 +1,68 @@
+
+<div class="admin-shell">
+  <aside class="sidebar">
+    <div class="brand">
+      <span class="brand-icon">I</span>
+      <div>
+        <h2>InsureCare</h2>
+        <small>Policy Lifecycle</small>
+      </div>
+    </div>
+
+    <p class="menu-label">POLICY LIFECYCLE</p>
+
+    <nav class="menu">
+      <a routerLink="/admin/policy-lifecycle"
+         routerLinkActive="active"
+         [routerLinkActiveOptions]="{ exact: true }">
+        <span>▦</span> Overview
+      </a>
+
+      <a routerLink="/admin/policy-lifecycle/issuance"
+         routerLinkActive="active">
+        <span>▣</span> Policy Issuance
+      </a>
+
+      <a routerLink="/admin/policy-lifecycle/renewal"
+         routerLinkActive="active">
+        <span>↻</span> Policy Renewal
+      </a>
+
+      <a routerLink="/admin/policy-lifecycle/closure"
+         routerLinkActive="active">
+        <span>×</span> Policy Closure
+      </a>
+
+      <a routerLink="/admin/policy-lifecycle/servicing"
+         routerLinkActive="active">
+        <span>⚙</span> Policy Servicing
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <strong>Policy Lifecycle</strong>
+      <small>Insurance Management System</small>
+    </div>
+  </aside>
+
+  <main class="main-area">
+    <header class="topbar">
+      <div>
+        <h1>Policy Lifecycle</h1>
+        <p>Manage policy issuance, renewal, closure and servicing.</p>
+      </div>
+
+      <div class="admin-profile">
+        <span class="avatar">A</span>
+        <div>
+          <strong>Administrator</strong>
+          <small>Policy Management</small>
+        </div>
+      </div>
+    </header>
+
+    <section class="page-content">
+      <router-outlet></router-outlet>
+    </section>
+  </main>
+</div>

@@ -1,0 +1,285 @@
+
+<div class="servicing-page">
+  <div class="page-heading">
+    <a class="back-link" routerLink="/admin/policy-lifecycle">
+      ← Policy Lifecycle
+    </a>
+    <h2>Policy Servicing</h2>
+    <p>Manage customer requests for changes to existing insurance policies.</p>
+  </div>
+
+  <section class="summary-grid">
+    <article class="summary-card">
+      <span>Total Requests</span>
+      <strong>{{ requests.length }}</strong>
+    </article>
+
+    <article class="summary-card">
+      <span>Submitted</span>
+      <strong class="orange">{{ pendingCount }}</strong>
+    </article>
+
+    <article class="summary-card">
+      <span>Under Review</span>
+      <strong class="blue">{{ inReviewCount }}</strong>
+    </article>
+
+    <article class="summary-card">
+      <span>Completed / Closed</span>
+      <strong class="green">{{ completedCount }}</strong>
+    </article>
+  </section>
+
+  <section class="table-panel">
+    <div class="panel-heading">
+      <div>
+        <h3>Service Requests</h3>
+        <p>View requests and update their status through the backend.</p>
+      </div>
+      <span class="record-count">{{ filteredRequests.length }} records</span>
+    </div>
+
+    <div class="filters">
+      <input
+        type="search"
+        placeholder="Search request, policy, customer or type..."
+        aria-label="Search service requests"
+        [value]="searchText"
+        (input)="searchText = $any($event.target).value"
+      />
+
+      <select
+        aria-label="Filter service request status"
+        [value]="selectedStatus"
+        (change)="selectedStatus = $any($event.target).value"
+      >
+        <option value="All">All statuses</option>
+        @for (status of statuses; track status) {
+          <option [value]="status">{{ statusLabel(status) }}</option>
+        }
+      </select>
+
+      <button
+        type="button"
+        class="view-button"
+        [disabled]="loading"
+        (click)="loadRequests()"
+      >
+        {{ loading ? 'Refreshing...' : 'Refresh' }}
+      </button>
+    </div>
+
+    @if (loading && requests.length === 0) {
+      <p class="action-message" role="status">
+        Loading service requests...
+      </p>
+    }
+
+    @if (errorMessage) {
+      <p class="action-message" role="alert">
+        {{ errorMessage }}
+      </p>
+    }
+
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Request ID</th>
+            <th>Request Number</th>
+            <th>Policy ID</th>
+            <th>Customer ID</th>
+            <th>Request Type</th>
+            <th>Request Date</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          @for (request of filteredRequests; track request.requestId) {
+            <tr>
+              <td class="request-id">{{ request.requestId }}</td>
+              <td>{{ request.requestNumber || '—' }}</td>
+              <td>{{ request.policyId }}</td>
+              <td>{{ request.customerId }}</td>
+              <td>{{ request.requestType }}</td>
+              <td>
+                {{ request.requestDate | date:'dd MMM yyyy, hh:mm a' }}
+              </td>
+              <td>
+                <span
+                  class="status-badge"
+                  [class.pending]="request.status === 'SUBMITTED'"
+                  [class.in-review]="request.status === 'UNDER_REVIEW'"
+                  [class.approved]="request.status === 'APPROVED'"
+                  [class.rejected]="request.status === 'REJECTED'"
+                  [class.completed]="request.status === 'COMPLETED' || request.status === 'CLOSED'"
+                >
+                  {{ statusLabel(request.status) }}
+                </span>
+              </td>
+              <td>
+                <button
+                  type="button"
+                  class="view-button"
+                  (click)="viewRequest(request)"
+                >
+                  View
+                </button>
+              </td>
+            </tr>
+          } @empty {
+            @if (!loading) {
+              <tr>
+                <td colspan="8" class="empty-state">
+                  No service requests found.
+                </td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  @if (selectedRequest) {
+    <div class="modal-backdrop" (click)="closeDetails()">
+      <section
+        class="details-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="service-details-title"
+        (click)="$event.stopPropagation()"
+      >
+        <div class="modal-heading">
+          <div>
+            <h3 id="service-details-title">Service Request Details</h3>
+            <p>{{ selectedRequest.requestNumber }}</p>
+          </div>
+
+          <button
+            type="button"
+            class="close-button"
+            aria-label="Close details"
+            (click)="closeDetails()"
+          >×</button>
+        </div>
+
+        <div class="details-grid">
+          <div>
+            <span>Request ID</span>
+            <strong>{{ selectedRequest.requestId }}</strong>
+          </div>
+
+          <div>
+            <span>Request Number</span>
+            <strong>{{ selectedRequest.requestNumber || '—' }}</strong>
+          </div>
+
+          <div>
+            <span>Policy ID</span>
+            <strong>{{ selectedRequest.policyId }}</strong>
+          </div>
+
+          <div>
+            <span>Customer ID</span>
+            <strong>{{ selectedRequest.customerId }}</strong>
+          </div>
+
+          <div>
+            <span>Request Type</span>
+            <strong>{{ selectedRequest.requestType }}</strong>
+          </div>
+
+          <div>
+            <span>Request Date</span>
+            <strong>
+              {{ selectedRequest.requestDate | date:'dd MMM yyyy, hh:mm a' }}
+            </strong>
+          </div>
+
+          <div>
+            <span>Current Status</span>
+            <strong>{{ statusLabel(selectedRequest.status) }}</strong>
+          </div>
+        </div>
+
+        <div class="form-field">
+          <label for="actionBy">Staff / Officer ID</label>
+          <input
+            id="actionBy"
+            type="number"
+            min="1"
+            [(ngModel)]="actionBy"
+            placeholder="Enter staff ID"
+          />
+          <small>
+            Enter a valid staff/officer ID recognised by your backend.
+          </small>
+        </div>
+
+        @if (actionMessage) {
+          <p class="action-message" role="status">
+            {{ actionMessage }}
+          </p>
+        }
+
+        @if (errorMessage) {
+          <p class="action-message" role="alert">
+            {{ errorMessage }}
+          </p>
+        }
+
+        <div class="modal-actions">
+          <button
+            type="button"
+            class="secondary-button"
+            (click)="closeDetails()"
+          >Close</button>
+
+          @if (selectedRequest.status === 'SUBMITTED') {
+            <button
+              type="button"
+              class="review-button"
+              (click)="startReview(selectedRequest)"
+            >Start Review</button>
+          }
+
+          @if (
+            selectedRequest.status === 'SUBMITTED' ||
+            selectedRequest.status === 'UNDER_REVIEW'
+          ) {
+            <button
+              type="button"
+              class="reject-button"
+              (click)="rejectRequest(selectedRequest)"
+            >Reject</button>
+
+            <button
+              type="button"
+              class="approve-button"
+              (click)="approveRequest(selectedRequest)"
+            >Approve</button>
+          }
+
+          @if (selectedRequest.status === 'APPROVED') {
+            <button
+              type="button"
+              class="complete-button"
+              (click)="completeRequest(selectedRequest)"
+            >Mark Completed</button>
+          }
+
+          @if (selectedRequest.status === 'COMPLETED') {
+            <button
+              type="button"
+              class="secondary-button"
+              (click)="closeRequest(selectedRequest)"
+            >Close Request</button>
+          }
+        </div>
+      </section>
+    </div>
+  }
+</div>

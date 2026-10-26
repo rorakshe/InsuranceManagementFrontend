@@ -1,0 +1,323 @@
+
+<div class="closure-page">
+  <div class="page-heading">
+    <div>
+      <a class="back-link" routerLink="/admin/policy-lifecycle">
+        ← Policy Lifecycle
+      </a>
+      <h2>Policy Closure</h2>
+      <p>Manage cancellation requests, refunds, approvals and rejections.</p>
+    </div>
+
+    <button type="button" class="renew-button" (click)="openCancelForm()">
+      + New Cancellation
+    </button>
+  </div>
+
+  @if (actionMessage) {
+    <div class="notice success-notice" role="status">
+      {{ actionMessage }}
+    </div>
+  }
+
+  @if (errorMessage) {
+    <div class="notice error-notice" role="alert">
+      {{ errorMessage }}
+      <button type="button" class="secondary-button" (click)="loadRequests()">
+        Retry
+      </button>
+    </div>
+  }
+
+  <section class="summary-grid">
+    <article class="summary-card">
+      <span>Total Requests</span>
+      <strong>{{ requests.length }}</strong>
+    </article>
+
+    <article class="summary-card pending-card">
+      <span>Pending</span>
+      <strong>{{ pendingCount }}</strong>
+    </article>
+
+    <article class="summary-card approved-card">
+      <span>Approved</span>
+      <strong>{{ approvedCount }}</strong>
+    </article>
+
+    <article class="summary-card rejected-card">
+      <span>Rejected</span>
+      <strong>{{ rejectedCount }}</strong>
+    </article>
+  </section>
+
+  <section class="table-panel">
+    <div class="panel-heading">
+      <div>
+        <h3>Cancellation Requests</h3>
+        <p>Records loaded from the Policy Closure backend.</p>
+      </div>
+
+      <div class="panel-actions">
+        <span class="record-count">{{ filteredRequests.length }} records</span>
+        <button
+          type="button"
+          class="secondary-button"
+          (click)="loadRequests()"
+          [disabled]="loading"
+        >
+          {{ loading ? 'Loading...' : 'Refresh' }}
+        </button>
+      </div>
+    </div>
+
+    <div class="filters">
+      <input
+        type="search"
+        placeholder="Search request number, policy ID or reason..."
+        aria-label="Search cancellation requests"
+        [value]="searchText"
+        (input)="searchText = $any($event.target).value"
+      />
+
+      <select
+        aria-label="Filter cancellation status"
+        [value]="selectedStatus"
+        (change)="selectedStatus = $any($event.target).value"
+      >
+        <option value="All">All statuses</option>
+        @for (status of statuses; track status) {
+          <option [value]="status">{{ status }}</option>
+        }
+      </select>
+    </div>
+
+    @if (loading) {
+      <div class="empty-state">Loading cancellation requests...</div>
+    } @else {
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Request Number</th>
+              <th>Policy ID</th>
+              <th>Request Date</th>
+              <th>Cancellation Reason</th>
+              <th>Refund Amount</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            @for (request of filteredRequests; track request.cancellationId) {
+              <tr>
+                <td class="policy-id">
+                  {{ request.cancellationRequestNumber || 'CLR-' + request.cancellationId }}
+                </td>
+                <td>{{ request.policyId }}</td>
+                <td>{{ request.cancellationDate | date:'dd MMM yyyy' }}</td>
+                <td class="reason-cell">{{ request.cancellationReason }}</td>
+                <td>
+                  {{ (request.refundAmount ?? 0) | currency:'INR':'symbol':'1.0-2' }}
+                </td>
+                <td>
+                  <span
+                    class="status-badge"
+                    [class.pending]="request.requestStatus === 'PENDING'"
+                    [class.approved]="request.requestStatus === 'APPROVED'"
+                    [class.rejected]="request.requestStatus === 'REJECTED'"
+                    [class.closed]="request.requestStatus === 'CLOSED'"
+                  >
+                    {{ request.requestStatus }}
+                  </span>
+                </td>
+                <td>
+                  <button
+                    type="button"
+                    class="view-button"
+                    (click)="viewRequest(request)"
+                  >
+                    View
+                  </button>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="7" class="empty-state">
+                  No cancellation requests match your search.
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+
+    <p class="demo-note">
+      Request status and refund information are supplied by the backend.
+      Approval and rejection are sent to the cancellation API.
+    </p>
+  </section>
+
+  @if (showCancelForm) {
+    <div class="modal-backdrop" (click)="closeCancelForm()">
+      <section
+        class="details-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="new-cancellation-title"
+        (click)="$event.stopPropagation()"
+      >
+        <div class="modal-heading">
+          <div>
+            <h3 id="new-cancellation-title">New Cancellation Request</h3>
+            <p>Submit a request for an existing policy.</p>
+          </div>
+
+          <button
+            type="button"
+            class="close-button"
+            aria-label="Close form"
+            (click)="closeCancelForm()"
+          >×</button>
+        </div>
+
+        <form class="closure-form" (ngSubmit)="submitCancellation()">
+          <label>
+            Policy ID
+            <input
+              type="number"
+              name="policyId"
+              min="1"
+              [(ngModel)]="cancellationForm.policyId"
+              required
+            />
+          </label>
+
+          <label>
+            Cancellation Reason
+            <textarea
+              name="cancellationReason"
+              rows="4"
+              [(ngModel)]="cancellationForm.cancellationReason"
+              placeholder="Enter the reason for cancellation"
+              required
+            ></textarea>
+          </label>
+
+          <div class="modal-actions">
+            <button
+              type="button"
+              class="secondary-button"
+              (click)="closeCancelForm()"
+            >
+              Cancel
+            </button>
+
+            <button
+              type="submit"
+              class="renew-button"
+              [disabled]="saving"
+            >
+              {{ saving ? 'Submitting...' : 'Submit Request' }}
+            </button>
+          </div>
+        </form>
+      </section>
+    </div>
+  }
+
+  @if (selectedRequest; as request) {
+    <div class="modal-backdrop" (click)="closeDetails()">
+      <section
+        class="details-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="closure-details-title"
+        (click)="$event.stopPropagation()"
+      >
+        <div class="modal-heading">
+          <div>
+            <h3 id="closure-details-title">Cancellation Details</h3>
+            <p>
+              {{ request.cancellationRequestNumber || 'CLR-' + request.cancellationId }}
+            </p>
+          </div>
+
+          <button
+            type="button"
+            class="close-button"
+            aria-label="Close details"
+            (click)="closeDetails()"
+          >×</button>
+        </div>
+
+        <div class="details-grid">
+          <div><span>Cancellation ID</span><strong>{{ request.cancellationId }}</strong></div>
+          <div><span>Policy ID</span><strong>{{ request.policyId }}</strong></div>
+          <div><span>Request Date</span><strong>{{ request.cancellationDate | date:'dd MMM yyyy' }}</strong></div>
+          <div><span>Refund Amount</span><strong>{{ (request.refundAmount ?? 0) | currency:'INR':'symbol':'1.0-2' }}</strong></div>
+          <div><span>Status</span><strong>{{ request.requestStatus }}</strong></div>
+          <div><span>Officer ID</span><strong>{{ request.approvedBy ?? 'Not assigned' }}</strong></div>
+          <div><span>Decision Date</span><strong>{{ request.decisionDate ? (request.decisionDate | date:'dd MMM yyyy, h:mm a') : 'Not decided' }}</strong></div>
+          <div><span>Decision Remarks</span><strong>{{ request.decisionRemarks || 'No remarks' }}</strong></div>
+        </div>
+
+        <div class="decision-form">
+          <label>
+            Officer ID
+            <input
+              type="number"
+              name="approvedBy"
+              min="1"
+              [(ngModel)]="decisionForm.approvedBy"
+              required
+            />
+          </label>
+
+          <label>
+            Decision Remarks
+            <textarea
+              name="remarks"
+              rows="3"
+              [(ngModel)]="decisionForm.remarks"
+              maxlength="1000"
+              placeholder="Enter decision remarks"
+            ></textarea>
+          </label>
+        </div>
+
+        <div class="modal-actions">
+          @if (request.requestStatus === 'PENDING') {
+            <button
+              type="button"
+              class="approve-button"
+              (click)="approveRequest(request)"
+              [disabled]="saving"
+            >
+              {{ saving ? 'Processing...' : 'Approve' }}
+            </button>
+
+            <button
+              type="button"
+              class="reject-button"
+              (click)="rejectRequest(request)"
+              [disabled]="saving"
+            >
+              {{ saving ? 'Processing...' : 'Reject' }}
+            </button>
+          }
+
+          <button
+            type="button"
+            class="secondary-button"
+            (click)="closeDetails()"
+          >
+            Close
+          </button>
+        </div>
+      </section>
+    </div>
+  }
+</div>

@@ -1,0 +1,78 @@
+
+<section class="customer-page">
+  <div class="page-heading">
+    <div>
+      <h2>Customer Management</h2>
+      <p>View and manage registered insurance customers.</p>
+    </div>
+
+    <a class="add-button" routerLink="/admin/customers/add">
+      + Add Customer
+    </a>
+  </div>
+
+  <div class="toolbar">
+    <input
+      type="search"
+      placeholder="Search by name, email, phone or status..."
+      aria-label="Search customers"
+      [value]="searchText"
+      (input)="searchText = $any($event.target).value"
+    />
+
+    <span>{{ filteredCustomers.length }} customers</span>
+  </div>
+
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Customer Name</th>
+          <th>Email</th>
+          <th>Phone</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        @for (customer of filteredCustomers; track customer.id) {
+          <tr>
+            <td>{{ customer.id }}</td>
+            <td class="customer-name">{{ customer.name }}</td>
+            <td>{{ customer.email }}</td>
+            <td>{{ customer.phone }}</td>
+            <td>
+              <span
+                class="status"
+                [class.active]="customer.status === 'Active'"
+                [class.pending]="customer.status === 'Pending'"
+              >
+                {{ customer.status }}
+              </span>
+            </td>
+            <td>
+              <a
+                class="view-button"
+                [routerLink]="['/admin/customers', customer.id]"
+              >
+                View
+              </a>
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="6" class="empty-state">
+              No customers found.
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <p class="demo-note">
+    Demo data only. Customer records will be loaded from the backend after API integration.
+  </p>
+</section>

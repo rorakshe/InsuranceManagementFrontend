@@ -1,0 +1,159 @@
+
+:host {
+  display: block;
+}
+
+.customer-page {
+  display: grid;
+  gap: 22px;
+}
+
+.page-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.page-heading h2 {
+  margin: 0 0 8px;
+  color: #1e293b;
+  font-size: 23px;
+}
+
+.page-heading p {
+  margin: 0;
+  color: #64748b;
+  font-size: 14px;
+}
+
+.add-button,
+.view-button {
+  display: inline-block;
+  text-decoration: none;
+  font-weight: 600;
+  border-radius: 7px;
+}
+
+.add-button {
+  padding: 12px 16px;
+  color: #fff;
+  background: #2563eb;
+  white-space: nowrap;
+}
+
+.add-button:hover {
+  background: #1d4ed8;
+}
+
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  color: #64748b;
+  font-size: 13px;
+}
+
+.toolbar input {
+  box-sizing: border-box;
+  width: min(100%, 430px);
+  padding: 12px 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: #fff;
+  font-size: 14px;
+  outline: none;
+}
+
+.toolbar input:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px #dbeafe;
+}
+
+.table-container {
+  overflow-x: auto;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 13px;
+}
+
+th,
+td {
+  padding: 16px;
+  border-bottom: 1px solid #e2e8f0;
+  white-space: nowrap;
+}
+
+th {
+  color: #64748b;
+  background: #f8fafc;
+  font-weight: 600;
+}
+
+tbody tr:hover {
+  background: #f8fafc;
+}
+
+tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.customer-name {
+  color: #1e293b;
+  font-weight: 600;
+}
+
+.status {
+  display: inline-block;
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+}
+
+.status.active {
+  color: #166534;
+  background: #dcfce7;
+}
+
+.status.pending {
+  color: #92400e;
+  background: #fef3c7;
+}
+
+.view-button {
+  padding: 7px 12px;
+  color: #1d4ed8;
+  background: #eff6ff;
+}
+
+.view-button:hover {
+  background: #dbeafe;
+}
+
+.empty-state {
+  padding: 30px;
+  text-align: center;
+  color: #64748b;
+}
+
+.demo-note {
+  margin: 0;
+  color: #64748b;
+  font-size: 12px;
+}
+
+@media (max-width: 600px) {
+  .page-heading,
+  .toolbar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

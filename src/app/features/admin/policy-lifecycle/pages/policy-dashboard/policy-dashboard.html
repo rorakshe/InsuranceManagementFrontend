@@ -1,0 +1,82 @@
+
+<div class="policy-dashboard">
+  <section class="welcome">
+    <div>
+      <span class="eyebrow">POLICY ADMINISTRATION SYSTEM</span>
+      <h2>Policy Lifecycle Management</h2>
+      <p>Manage policies from issuance through renewal, closure and servicing.</p>
+    </div>
+    <span class="system-status">Policy Operations</span>
+  </section>
+
+  <section class="stats">
+    <article class="stat-card">
+      <span class="stat-label">Policies Issued</span>
+      <h3>--</h3>
+      <span class="stat-description">Total issued policies</span>
+    </article>
+
+    <article class="stat-card">
+      <span class="stat-label">Renewals Due</span>
+      <h3>--</h3>
+      <span class="stat-description">Policies requiring renewal</span>
+    </article>
+
+    <article class="stat-card">
+      <span class="stat-label">Closure Requests</span>
+      <h3>--</h3>
+      <span class="stat-description">Awaiting processing</span>
+    </article>
+
+    <article class="stat-card">
+      <span class="stat-label">Service Requests</span>
+      <h3>--</h3>
+      <span class="stat-description">Requests to be processed</span>
+    </article>
+  </section>
+
+  <section class="section-heading">
+    <div>
+      <h3>Policy Operations</h3>
+      <p>Select a module to manage the policy lifecycle.</p>
+    </div>
+  </section>
+
+  <section class="module-grid">
+    <a routerLink="/admin/policy-lifecycle/issuance" class="module-card">
+      <div class="module-icon blue">01</div>
+      <h3>Policy Issuance</h3>
+      <p>Review eligible applications and manage policy issuance.</p>
+      <span>Open module →</span>
+    </a>
+
+    <a routerLink="/admin/policy-lifecycle/renewal" class="module-card">
+      <div class="module-icon green">02</div>
+      <h3>Policy Renewal</h3>
+      <p>Review renewal-due policies and process renewal requests.</p>
+      <span>Open module →</span>
+    </a>
+
+    <a routerLink="/admin/policy-lifecycle/closure" class="module-card">
+      <div class="module-icon orange">03</div>
+      <h3>Policy Closure</h3>
+      <p>Review policy closure requests and their settlement details.</p>
+      <span>Open module →</span>
+    </a>
+
+    <a routerLink="/admin/policy-lifecycle/servicing" class="module-card">
+      <div class="module-icon purple">04</div>
+      <h3>Policy Servicing</h3>
+      <p>Manage policy changes and customer service requests.</p>
+      <span>Open module →</span>
+    </a>
+  </section>
+
+  <section class="notice">
+    <strong>Dashboard data</strong>
+    <p>
+      Statistics will be populated from your backend APIs after integration.
+      No live policy figures are available in this initial UI.
+    </p>
+  </section>
+</div>
